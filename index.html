@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D'koko | Champú en Barra Artesanal</title>
+    <style>
+.wa-float-right {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25d366;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 30px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.wa-svg {
+    width: 35px;
+    height: 35px;
+    fill: #fff;
+}
+
+.wa-float-right:hover {
+    transform: scale(1.1);
+    background-color: #128c7e;
+}
+
+/* IMPORTANTE: Ocultar cuando el carrito esté abierto */
+#cartSidebar.active ~ .wa-float-right {
+    display: none !important;
+}
+
+/* Ocultar botones flotantes cuando el carrito está activo */
+#cartSidebar.active ~ .whatsapp-float,
+#cartSidebar.active ~ .instagram-float {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+/* Asegurar que el carrito siempre esté por encima de los botones si no se ocultan */
+.cart-sidebar {
+    z-index: 10000; /* Un número más alto que los botones flotantes */
+}
+
+/* 1. Ponlo aquí, al inicio de tus estilos */
+img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover; /* Esto es lo que evita que se vean estiradas o "aplastadas" */
+    display: block;    /* Ayuda a eliminar espacios extraños debajo de la imagen */
+}
+
+/* ... el resto de tus códigos (.whatsapp-btn, .social-link, etc.) ... */
+
+
+/* AJUSTES PARA CELULARES */
+@media (max-width: 768px) {
+    /* Ajusta el contenedor de la imagen principal */
+    .main-gallery-box {
+        width: 100%;       /* Ocupa todo el ancho disponible */
+        max-width: 300px;  /* Pero que no pase de 300px para que no se vea gigante */
+        height: 300px;     /* Altura cuadrada */
+        margin: 0 auto;    /* Centra la caja */
+    }
+
+    /* Ajusta las miniaturas */
+    .gallery-thumbs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .thumb {
+        width: 60px;  /* Miniaturas más pequeñas para que quepan en fila */
+        height: 60px;
+    }
+
+    /* Ajusta la sección Hero para que el texto y la imagen se apilen */
+    .hero {
+        flex-direction: column; /* Pone el texto arriba y la imagen abajo */
+        text-align: center;
+        padding: 20px;
+    }
+}
+
+/* ESTA PARTE ES LA QUE EVITA QUE EL LOGO SE VEA GIGANTE */
+.whatsapp-btn img {
+    width: 30px;  /* Tamaño pequeño del logo */
+    height: 30px; /* Tamaño pequeño del logo */
+    display: block;
+}
+
+/* Para que en el celular no estorbe */
+@media (max-width: 480px) {
+    .whatsapp-btn span {
+        display: none; /* Esconde el texto y deja solo el icono */
+    }
+    .whatsapp-btn {
+        padding: 12px;
+        border-radius: 50%;
+    }
+}
+
+        /* Estilos Globales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Ocultar el cursor por defecto en computadoras para usar el personalizado */
+        @media (min-width: 769px) {
+            body, button, a, input, textarea, .product-card, .thumb {
+                cursor: none !important;
+            }
+        }
+
+        body {
+            color: #3e3830; 
+            background-color: #faf7f2; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* === EFECTO DE CURSOR PERSONALIZADO (SHAMPOO Y BURBUJAS) === */
+        .custom-cursor {
+    width: 28px;
+    height: 28px;
+    background-color: #f5eedf;
+    border: 2px solid #c5a059;
+    border-radius: 6px;
+    position: fixed;
+    pointer-events: none; /* ESTO PERMITE QUE HAGAS CLIC EN EL BOTÓN A TRAVÉS DEL CURSOR */
+    z-index: 9999; /* El cursor sigue estando arriba de todo visualmente */
+    transform: translate(-50%, -50%);
+    display: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+        .custom-cursor::after {
+            content: '🧼';
+            font-size: 12px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* BURBUJAS MEJORADAS: MÁS VISIBLES Y REALISTAS */
+        .bubble {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            /* Efecto tornasol / iridiscente para que brillen */
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9) 0%, rgba(255,200,220,0.4) 40%, rgba(200,230,255,0.4) 70%, rgba(212,175,55,0.3) 100%);
+            /* Bordes marcados y brillo interno */
+            border: 1.5px solid rgba(255, 255, 255, 0.9);
+            box-shadow: inset -2px -2px 6px rgba(0, 0, 0, 0.05), inset 2px 2px 6px rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 50%;
+            animation: flotarBurbuja 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes flotarBurbuja {
+            0% {
+                transform: translate(-50%, -50%) scale(0.4);
+                opacity: 0;
+            }
+            15% {
+                opacity: 1; /* Aparecen rápido */
+            }
+            100% {
+                /* Se elevan y se dispersan a los lados con un ligero balanceo */
+                transform: translate(calc(-50% + var(--x)), calc(-50% - 100px)) scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        /* === MARQUESINA === */
+        .marquesina-container {
+            background-color: #2e5339; 
+            color: #eadecc; 
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 0.6rem 0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #c5a059; 
+            position: relative;
+            z-index: 50;
+            width: 100%;
+        }
+
+        .marquesina-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: moverMarquesina 25s linear infinite;
+        }
+
+        .marquesina-text span {
+            display: inline-block;
+            padding-right: 3rem; 
+        }
+
+        .marquesina-container:hover .marquesina-text {
+            animation-play-state: paused;
+        }
+
+        @keyframes moverMarquesina {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+
+        /* === BARRA DE NAVEGACIÓN === */
+        header {
+            background-color: #ffffff;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.1); 
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid #eadecc; 
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2e5339; 
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #6e6456;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #c5a059; 
+        }
+
+        .lang-btn {
+            background: none;
+            border: 1px solid #c5a059;
+            color: #6e6456;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .lang-btn:hover {
+            background-color: #c5a059;
+            color: white;
+        }
+
+        .cart-icon-container {
+            position: relative;
+            font-size: 1.4rem;
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background-color: #c5a059;
+            color: white;
+            font-size: 0.75rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .nav-btn-contact {
+            background-color: #2e5339;
+            color: #faf7f2 !important;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .nav-btn-contact:hover {
+            background-color: #1c3524;
+            color: #ffffff !important;
+        }
+
+        /* === SECCIÓN HERO === */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5rem 5%;
+            background: linear-gradient(135deg, #f3ede2 0%, #e3d5bf 100%); 
+            min-height: 80vh;
+        }
+
+        .hero-content { max-width: 48%; }
+        .hero-content h1 {
+            font-size: 3rem;
+            color: #2e5339; 
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+        .hero-content p {
+            font-size: 1.2rem;
+            color: #5c5245;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #c5a059; 
+            color: white;
+            padding: 0.8rem 2rem;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #ae8a47; 
+            transform: translateY(-2px);
+        }
+
+        /* === GALERÍA DE FOTOS INTERACTIVA === */
+        .hero-image { 
+            max-width: 48%; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+       .main-gallery-box {
+    width: 350px; 
+    height: 350px; 
+    background-color: #f5eedf;
+    border: 3px solid #c5a059; 
+    border-radius: 20px; 
+    overflow: hidden; /* Esto es clave para que la imagen no se salga del borde */
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    display: block;
+}
+
+.main-gallery-box img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; /* Evita que la imagen se vea gigantesca o deforme */
+    display: block;
+    transition: opacity 0.3s ease;
+}
+
+.thumb {
+    width: 70px; 
+    height: 70px; 
+    background-color: #fff;
+    border: 2px solid #eadecc; 
+    border-radius: 10px;
+    overflow: hidden; /* Mantiene la miniatura dentro de su cuadrito */
+    cursor: pointer; 
+    transition: 0.3s;
+    padding: 0; 
+}
+
+.thumb img {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover;
+    display: block;
+}
+
+/* Quitamos el transform: scale() para que las miniaturas no se pasen de los bordes al tocarlas */
+.thumb.active, .thumb:hover { 
+    border-color: #c5a059; 
+}
+
+        /* === CATÁLOGO DE PRODUCTOS === */
+        .catalog-section {
+            padding: 5rem 5%;
+            text-align: center;
+            background-color: #ffffff;
+        }
+        .catalog-section h2 {
+            font-size: 2.2rem;
+            color: #2e5339;
+            margin-bottom: 3rem;
+        }
+        .catalog-grid {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .product-card {
+            background-color: #faf7f2;
+            border: 1px solid #eadecc;
+            border-radius: 20px;
+            padding: 2rem;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: #c5a059;
+        }
+        .product-img-box {
+            width: 100%;
+            height: 200px;
+            background-color: #eadecc;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2e5339;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        .product-card h3 {
+            color: #2e5339;
+            margin-bottom: 0.5rem;
+        }
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #c5a059;
+            margin-bottom: 1rem;
+        }
+        .btn-add-cart {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+            background-color: #2e5339;
+        }
+        .btn-add-cart:hover {
+            background-color: #1c3524;
+        }
+
+        /* === COMENTARIOS / BENEFICIOS === */
+        .benefits { padding: 5rem 5%; text-align: center; background-color: #faf7f2;}
+        .benefits h2 { font-size: 2.2rem; color: #2e5339; margin-bottom: 3rem; }
+        .grid { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+        .card {
+            background: white; 
+            padding: 2.5rem 1.5rem; border-radius: 15px; flex: 1; min-width: 250px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02); border: 1px solid #eadecc;
+        }
+        .card h3 { color: #2e5339; margin-bottom: 1rem; }
+        .card-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+        /* === SECCIÓN DE CONTACTO Y FORMULARIO === */
+        .contact-section { 
+            padding: 5rem 5%; 
+            background-color: #ffffff; 
+            text-align: center; 
+        }
+        .contact-section h2 { font-size: 2.2rem; color: #2e5339; margin-bottom: 1rem; }
+        .contact-section p { color: #6e6456; margin-bottom: 2rem; max-width: 600px; margin: 0 auto 2rem auto; }
+
+        .contact-buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            box-shadow: 0 4px 15px rgba(220, 39, 67, 0.3);
+        }
+        .btn-instagram:hover {
+            background: linear-gradient(45deg, #e08423 0%, #d6582c 25%, #cc1733 50%, #bc1356 75%, #ac0878 100%);
+        }
+
+        .question-form {
+            max-width: 550px;
+            margin: 0 auto;
+            background-color: #faf7f2;
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid #eadecc;
+            box-shadow: 0 4px 15px rgba(62, 56, 48, 0.05);
+            text-align: left;
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2e5339; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 0.8rem; border: 1px solid #eadecc; border-radius: 10px; background-color: #ffffff; font-size: 1rem; color: #3e3830; outline: none;
+        }
+        .form-group input:focus, .form-group textarea:focus { border-color: #c5a059; }
+        .btn-submit { width: 100%; background-color: #2e5339; }
+        .btn-submit:hover { background-color: #1c3524; }
+
+        /* === INTERFAZ DEL CARRITO LATERAL === */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 380px;
+            height: 100%;
+            background-color: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-sidebar.active { right: 0; }
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eadecc;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .close-cart { font-size: 1.5rem; background: none; border: none; color: #6e6456; }
+        .cart-items { flex-grow: 1; overflow-y: auto; }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #faf7f2;
+        }
+        .cart-total {
+            border-top: 2px solid #eadecc; padding-top: 1rem; font-size: 1.2rem; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 1rem;
+        }
+
+        /* === BOTONES FLOTANTES INTERACTIVOS === */
+        .whatsapp-float {
+            position: fixed; bottom: 30px; right: 30px; background-color: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-decoration: none; z-index: 99; transition: transform 0.3s;
+        }
+        .whatsapp-float:hover { transform: scale(1.1); }
+
+        .instagram-float {
+            position: fixed; bottom: 30px; left: 30px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-decoration: none; z-index: 99; transition: transform 0.3s;
+        }
+        .instagram-float:hover { transform: scale(1.1); }
+
+        /* === FOOTER === */
+        footer {
+            background-color: #1c3524; color: #eadecc; text-align: center; padding: 2rem; font-size: 0.9rem; border-top: 3px solid #c5a059; 
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero { flex-direction: column-reverse; text-align: center; padding: 3rem 5%; }
+            .hero-content { max-width: 100%; margin-top: 2rem; }
+            .hero-content h1 { font-size: 2.2rem; }
+            .hero-image { max-width: 100%; }
+            .main-gallery-box { width: 280px; height: 280px; }
+            header { flex-direction: column; gap: 15px; }
+            nav { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            .cart-sidebar { width: 100%; right: -100%; }
+        }
+
+/* AJUSTES PARA EL LOGO Y EL CONTENIDO HERO */
+.brand-logo-container {
+    display: flex;
+    justify-content: flex-start; /* Alineado al texto en PC */
+}
+
+.brand-logo-container img {
+    /* Medidas de seguridad */
+    max-width: 150px;
+    height: auto;
+}
+
+/* Ajuste automático para celulares */
+@media (max-width: 768px) {
+    .brand-logo-container {
+        justify-content: center; /* Centra el logo cuando el texto se centra en móvil */
+        margin-top: 20px;
+    }
+    .brand-logo-container img {
+        max-width: 120px; /* Un poco más pequeño en móvil para que no estorbe */
+    }
+}
+    </style>        
+</head>
+<body>
+
+    <div class="custom-cursor" id="customCursor"></div>
+
+    <a href="https://www.instagram.com/dkoko2026/?utm_source=ig_web_button_share_sheet" class="instagram-float" target="_blank" rel="noopener noreferrer">📸</a>
+    <div class="marquesina-container">
+        <div class="marquesina-text" id="marquee-text">
+            <span class="lang" data-es="✨ ¡ENVÍOS GRATIS en compras mayores a $35! 🥥" data-en="✨ FREE SHIPPING on orders over $35! 🥥">✨ ¡ENVÍOS GRATIS en compras mayores a $35! 🥥</span>
+            <span class="lang" data-es="🌿 100% Orgánico y Libre de Crueldad Animal 🐰" data-en="🌿 100% Organic & Cruelty Free 🐰">🌿 100% Orgánico y Libre de Crueldad Animal 🐰</span>
+            <span class="lang" data-es="💥 10% DE DESCUENTO con el código: DKOKO10 ✨" data-en="💥 10% OFF with code: DKOKO10 ✨">💥 10% DE DESCUENTO con el código: DKOKO10 ✨</span>
+        </div>
+    </div>
+
+   <header>
+   <nav>
+    <a href="#inicio">Inicio</a>
+    <a href="#catalogo">Catálogo</a>
+    <a href="https://www.instagram.com/dkoko2026/" target="_blank" rel="noopener noreferrer" class="social-link">Instagram</a>
+    
+    <button class="lang-btn" id="langBtn" onclick="toggleLanguage()">EN</button>
+    
+    <button class="btn" onclick="toggleCart()">🛒 <span id="cart-count">0</span></button>
+</nav>
+</header>
+
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3 class="lang" data-es="Tu Carrito" data-en="Your Cart">Tu Carrito</h3>
+            <button class="close-cart" onclick="toggleCart()">✕</button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-total">
+            <span class="lang" data-es="Total:" data-en="Total:">Total:</span>
+            <span id="cartTotal">$0.00</span>
+        </div>
+        <button class="btn lang" style="width:100%; text-align:center;" data-es="Pagar Pedido" data-en="Checkout" onclick="checkoutWhatsApp()">Pagar por WhatsApp</button>
+    </div>
+
+    <section class="hero" id="inicio">
+       <div class="hero-content">
+    <div class="brand-logo-container" style="margin-bottom: 20px; display: flex;">
+        <img src="img/LOGOEMPRESARIAL.jpeg" alt="Logo D'koko" style="width: 250px; height: auto; object-fit: contain;">
+    </div>
+    
+    <h1>Revoluciona tu cabello con D'koko</h1>
+    <p>Pásate al lado sustentable con nuestro champú en barra premium enriquecido con aceite de coco puro.</p>
+    <a href="#catalogo" class="btn">Comprar Ahora</a>
+</div>
+        
+ <div class="hero-image">
+    <div class="main-gallery-box">
+        <img src="img/Fotococo1.jpeg" id="mainImage" alt="Shampoo D'koko">
+    </div>
+
+    <div class="gallery-thumbs">
+        <div class="thumb active" onclick="changeImage('img/Fotococo1.jpeg', this)">
+            <img src="img/Fotococo1.jpeg" alt="Vista 1">
+        </div>
+
+        <div class="thumb" onclick="changeImage('img/Fotococo2.jpeg', this)">
+            <img src="img/Fotococo2.jpeg" alt="Vista 2">
+        </div>
+
+        <div class="thumb" onclick="changeImage('img/Foco4.jpeg', this)">
+            <img src="img/Foco4.jpeg" alt="Vista 3">
+        </div>
+    </div>
+</div>
+    </section>
+
+    <section class="catalog-section" id="catalogo">
+        <h2 class="lang" data-es="Nuestro Catálogo" data-en="Our Catalog">Nuestro Catálogo</h2>
+        <div class="catalog-grid">
+            <div class="product-card">
+    <div class="product-img-box" style="padding: 0; overflow: hidden;">
+        <img src="img/Fotoshampu1.png" alt="Champú Coco" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+    <h3 class="lang" data-es="AquaNut" data-en="AquaNut">AquaNut</h3>
+    <p class="product-price">$12.00</p>
+    <button class="btn btn-add-cart lang" data-es="Agregar al Carrito" data-en="Add to Cart" onclick="addToCart('AquaNut', 12.00)">Agregar al Carrito</button>
+</div>
+           <div class="product-card">
+    <div class="product-img-box" style="padding: 0; overflow: hidden;">
+        <img src="img/Fotoshampu2.png" alt="Champú Coco" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+    <h3 class="lang" data-es="PureNut" data-en="PureNut">PureNut</h3>
+    <p class="product-price">$14.50</p>
+    <button class="btn btn-add-cart lang" data-es="Agregar al Carrito" data-en="Add to Cart" onclick="addToCart('PureNut', 12.00)">Agregar al Carrito</button>
+</div>
+           <div class="product-card">
+    <div class="product-img-box" style="padding: 0; overflow: hidden;">
+        <img src="img/Fotoshampu3.png" alt="Champú Coco" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+    <h3 class="lang" data-es="OlioNut" data-en="OlioNut">OlioNut</h3>
+    <p class="product-price">$13.00</p>
+    <button class="btn btn-add-cart lang" data-es="Agregar al Carrito" data-en="Add to Cart" onclick="addToCart('OlioNut', 12.00)">Agregar al Carrito</button>
+</div>
+    </section>
+
+    <section class="benefits">
+        <h2 class="lang" data-es="¿Por qué cambiarte a D'koko?" data-en="Why switch to D'koko?">¿Por qué cambiarte a D'koko?</h2>
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon">✨</div>
+                <h3 class="lang" data-es="Nutrición Absoluta" data-en="Absolute Nutrition">Nutrición Absoluta</h3>
+                <p class="lang" data-es="Repara las puntas dañadas gracias al poder lipídico del coco natural." data-en="Repairs damaged ends thanks to the lipid power of natural coconut.">Repara las puntas dañadas gracias al poder lipídico del coco natural.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🌍</div>
+                <h3 class="lang" data-es="Cero Plástico" data-en="Zero Plastic">Cero Plástico</h3>
+                <p class="lang" data-es="Ayuda al planeta. Una barra evita el desperdicio de dos botellas plásticas." data-en="Help the planet. One bar saves two plastic bottles from waste.">Ayuda al planeta. Una barra evita el desperdicio de dos botellas plásticas.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-section" id="contacto">
+        <h2 class="lang" data-es="Conéctate con Nosotros" data-en="Connect With Us">Conéctate con Nosotros</h2>
+        <p class="lang" data-es="Síguenos en nuestras redes sociales o déjanos tus dudas en el formulario." data-en="Follow us on social media or leave your questions in the form.">Síguenos en nuestras redes sociales o déjanos tus dudas en el formulario.</p>
+        
+        <div class="contact-buttons-container">
+            <a href="https://wa.me/584242750851" class="btn lang" data-es="WhatsApp Directo" data-en="Direct WhatsApp">WhatsApp Directo</a>
+            <a href="https://www.instagram.com/dkoko2026/?utm_source=ig_web_button_share_sheet" target="_blank" rel="noopener noreferrer" class="btn btn-instagram lang" data-es="Síguenos en Instagram" data-en="Follow on Instagram">Síguenos en Instagram</a>
+        </div>
+
+        <form class="question-form" onsubmit="handleFormSubmit(event)">
+            <div class="form-group">
+                <label for="name" class="lang" data-es="Nombre:" data-en="Name:">Nombre:</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email" class="lang" data-es="Correo Electrónico:" data-en="Email Address:">Correo Electrónico:</label>
+                <input type="email" id="email" required placeholder="ejemplo@correo.com">
+            </div>
+            <div class="form-group">
+                <label for="message" class="lang" data-es="Tu Pregunta o Mensaje:" data-en="Your Question or Message:">Tu Pregunta o Mensaje:</label>
+                <textarea id="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-submit lang" data-es="Enviar Pregunta" data-en="Send Question">Enviar Pregunta</button>
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 D'koko | Cuidado Capilar Consciente.</p>
+    </footer>
+
+    <script>
+        // --- 1. LÓGICA DEL CURSOR JABÓN + BURBUJAS MEJORADAS ---
+        const cursor = document.getElementById('customCursor');
+        let isHoveringButton = false;
+        let lastBubbleTime = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursor.style.display = 'block';
+
+            if (isHoveringButton) {
+                const now = Date.now();
+                // Controlar los milisegundos para generar más cantidad de burbujas continuas
+                if (now - lastBubbleTime > 40) { 
+                    createBubble(e.clientX, e.clientY);
+                    lastBubbleTime = now;
+                }
+            }
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cursor.style.display = 'none';
+        });
+
+        const interactiveElements = 'button, a, input, textarea, .product-card, .thumb, .cart-icon-container';
+        
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest(interactiveElements)) {
+                isHoveringButton = true;
+                cursor.style.transform = 'translate(-50%, -50%) scale(1.2) rotate(-10deg)'; 
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest(interactiveElements)) {
+                isHoveringButton = false;
+                cursor.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+            }
+        });
+
+        function createBubble(x, y) {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+            
+            // Tamaños un poco más grandes y notorios (de 12px a 24px)
+            const size = Math.random() * 12 + 12 + 'px';
+            bubble.style.width = size;
+            bubble.style.height = size;
+            
+            // Ligero desfase para que broten orgánicamente alrededor del jabón
+            const offsetX = (Math.random() - 0.5) * 15;
+            const offsetY = (Math.random() - 0.5) * 15;
+            bubble.style.left = (x + offsetX) + 'px';
+            bubble.style.top = (y + offsetY) + 'px';
+            
+            const randomX = (Math.random() - 0.5) * 70 + 'px';
+            bubble.style.setProperty('--x', randomX);
+            
+            document.body.appendChild(bubble);
+            
+            setTimeout(() => {
+                bubble.remove();
+            }, 1200);
+        }
+
+
+        // --- 2. LÓGICA DE LA GALERÍA DE FOTOS ---
+       function changeImage(newSrc, thumbnailElement) {
+    const mainImg = document.getElementById('mainImage');
+    mainImg.style.opacity = 0; 
+    
+    setTimeout(() => {
+        mainImg.src = newSrc; // Ahora cambia la ruta de la imagen
+        mainImg.style.opacity = 1;
+    }, 200);
+
+    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+    thumbnailElement.classList.add('active');
+}
+
+
+        // --- 3. MULTIIDIOMA ---
+        let currentLang = 'es';
+        const placeholders = {
+            es: { name: "Tu nombre...", message: "Escribe tu duda aquí..." },
+            en: { name: "Your name...", message: "Write your question here..." }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            document.getElementById('langBtn').innerText = currentLang === 'es' ? 'EN' : 'ES';
+            
+            document.querySelectorAll('.lang').forEach(element => {
+                const text = element.getAttribute(`data-${currentLang}`);
+                if (text) element.innerText = text;
+            });
+
+            document.getElementById('name').placeholder = placeholders[currentLang].name;
+            document.getElementById('message').placeholder = placeholders[currentLang].message;
+        }
+
+        document.getElementById('name').placeholder = placeholders.es.name;
+        document.getElementById('message').placeholder = placeholders.es.message;
+
+        // --- 4. CARRITO INTERACTIVO (COMPLETO) ---
+let cart = [];
+
+function toggleCart() { 
+    const cartSidebar = document.getElementById('cartSidebar');
+    
+    // Solo activamos o desactivamos la clase del carrito
+    cartSidebar.classList.toggle('active');
+
+    // OPCIONAL: Si realmente quieres ocultar el botón de WhatsApp 
+    // SOLAMENTE cuando el carrito esté abierto, usa este código:
+    const waButton = document.querySelector('.wa-float-right');
+    if (waButton) {
+        if (cartSidebar.classList.contains('active')) {
+            waButton.style.opacity = '0';
+            waButton.style.pointerEvents = 'none';
+        } else {
+            waButton.style.opacity = '1';
+            waButton.style.pointerEvents = 'auto';
+        }
+    }
+}
+function updateCartUI() {
+    const cartItemsContainer = document.getElementById('cartItems');
+    const cartCount = document.getElementById('cart-count');
+    const cartTotal = document.getElementById('cartTotal');
+    
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
+    let count = 0;
+
+    cart.forEach(item => {
+        total += item.price * item.quantity;
+        count += item.quantity;
+        cartItemsContainer.innerHTML += `
+            <div class="cart-item">
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-weight:bold;">${item.name}</span>
+                    <span>x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    cartCount.innerText = count;
+    cartTotal.innerText = `$${total.toFixed(2)}`;
+}
+
+// Función para enviar el pedido por WhatsApp
+function checkoutWhatsApp() {
+    if (cart.length === 0) {
+        alert("El carrito está vacío");
+        return;
+    }
+    
+    let message = "¡Hola D'koko! 🥥 Quisiera hacer un pedido:%0A%0A";
+    cart.forEach(item => {
+        message += `• ${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}%0A`;
+    });
+    
+    message += `%0A*Total a pagar: ${document.getElementById('cartTotal').innerText}*`;
+    
+    // Cambia el número si es necesario (el que tienes en el código es 04242750851)
+    window.open(`https://wa.me/584242750851?text=${message}`, '_blank');
+}
+
+// Lógica del formulario de contacto
+function handleFormSubmit(event) {
+    event.preventDefault();
+    alert("¡Gracias por tu mensaje! En D'koko te responderemos pronto.");
+    event.target.reset();
+}
+
+function toggleCart() { 
+    const cartSidebar = document.getElementById('cartSidebar');
+    // Seleccionamos TODOS los botones que estorban
+    const waFloat = document.querySelector('.whatsapp-float');   // El circulito
+    const waBtn = document.querySelector('.whatsapp-btn');       // El que dice "Chatea con nosotros"
+    const igFloat = document.querySelector('.instagram-float'); // El de Instagram
+
+    cartSidebar.classList.toggle('active');
+
+    if (cartSidebar.classList.contains('active')) {
+        // OCULTAR TODO
+        if(waFloat) waFloat.style.setProperty('display', 'none', 'important');
+        if(waBtn) waBtn.style.setProperty('display', 'none', 'important');
+        if(igFloat) igFloat.style.setProperty('display', 'none', 'important');
+    } else {
+        // MOSTRAR TODO (Usamos flex porque es el diseño original)
+        if(waFloat) waFloat.style.setProperty('display', 'flex', 'important');
+        if(waBtn) waBtn.style.setProperty('display', 'flex', 'important');
+        if(igFloat) igFloat.style.setProperty('display', 'flex', 'important');
+    }
+}
+
+function addToCart(name, price) {
+    // 1. Buscar si el producto ya está en el carrito
+    const existingItem = cart.find(item => item.name === name);
+
+    if (existingItem) {
+        // 2. Si ya existe, aumentar la cantidad
+        existingItem.quantity += 1;
+    } else {
+        // 3. Si es nuevo, agregarlo al arreglo 'cart'
+        cart.push({
+            name: name,
+            price: price,
+            quantity: 1
+        });
+    }
+
+    // 4. Actualizar visualmente el carrito y mostrar burbujas de éxito
+    updateCartUI();
+    
+    // Opcional: Abrir el carrito automáticamente al añadir algo
+    const cartSidebar = document.getElementById('cartSidebar');
+    if (!cartSidebar.classList.contains('active')) {
+        toggleCart();
+    }
+}
+
+    </script>
+</body>
+</html>
